@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile — EduMind</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="dash-nav-left">
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon"><svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      EduMind
+    </a>
+    <ul class="dash-nav-links">
+      <li><a href="dashboard.html">🏠 Home</a></li>
+      <li><a href="chat.html">💬 Ask Doubt</a></li>
+      <li><a href="study.html">📚 Study</a></li>
+      <li><a href="subjects.html">🧪 Subjects</a></li>
+      <li><a href="progress.html">📊 Progress</a></li>
+    </ul>
+  </div>
+  <a href="profile.html" class="nav-user">
+    <div class="nav-avatar" id="nav-avatar">A</div>
+    <div>
+      <div class="nav-user-name" id="nav-name">Student</div>
+      <div class="nav-user-class" id="nav-class">Class 10</div>
+    </div>
+  </a>
+</nav>
+
+<div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <a href="dashboard.html">🏠 Home</a>
+  <a href="chat.html">💬 Ask Doubt</a>
+  <a href="study.html">📚 Study</a>
+  <a href="subjects.html">🧪 Subjects</a>
+  <a href="progress.html">📊 Progress</a>
+  <a href="profile.html" class="active">👤 Profile</a>
+  <a href="settings.html">⚙️ Settings</a>
+</div>
+
+<div class="dash-layout">
+  <div class="dash-sidebar">
+    <div class="sidebar-section">
+      <span class="sidebar-section-label">Account</span>
+      <a href="profile.html" class="sidebar-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile
+      </a>
+      <a href="settings.html" class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings
+      </a>
+      <a href="dashboard.html" class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard
+      </a>
+    </div>
+  </div>
+
+  <div class="dash-main">
+    <!-- PROFILE HEADER -->
+    <div class="profile-header">
+      <div class="profile-avatar-lg" id="profile-avatar-lg">A</div>
+      <div style="flex:1;min-width:0">
+        <div class="profile-info-name" id="prof-name">Student</div>
+        <div class="profile-info-meta" id="prof-meta">Class 10 · CBSE</div>
+        <div class="profile-badges" id="prof-badges"></div>
+      </div>
+      <div>
+        <button class="btn-secondary btn-sm" onclick="openEditModal()">✏️ Edit Profile</button>
+      </div>
+    </div>
+
+    <!-- INFO CARDS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+      <div class="card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text-muted)">Student Information</div>
+        <div style="display:flex;flex-direction:column;gap:11px">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px"><span style="color:var(--text-muted)">Full Name</span><span id="info-name" style="font-weight:500">—</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px"><span style="color:var(--text-muted)">Username</span><code id="info-username" style="font-size:12px;background:var(--border-light);padding:2px 8px;border-radius:5px">—</code></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px"><span style="color:var(--text-muted)">Class</span><span id="info-class" style="font-weight:500">—</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px"><span style="color:var(--text-muted)">Stream</span><span id="info-stream" style="font-weight:500">—</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px"><span style="color:var(--text-muted)">Board</span><span style="font-weight:500">CBSE / NCERT</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px"><span style="color:var(--text-muted)">Member since</span><span id="info-joined" style="font-weight:500">—</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text-muted)">Learning Summary</div>
+        <div style="display:flex;flex-direction:column;gap:11px">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px"><span style="color:var(--text-muted)">Total Sessions</span><span id="sum-sessions" style="font-weight:700;color:var(--green)">0</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px"><span style="color:var(--text-muted)">Hours Studied</span><span id="sum-hours" style="font-weight:700;color:var(--blue)">0h</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px"><span style="color:var(--text-muted)">Chapters Done</span><span id="sum-chapters" style="font-weight:700;color:var(--purple)">0</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px"><span style="color:var(--text-muted)">Study Streak</span><span id="sum-streak" style="font-weight:700;color:var(--orange)">0 days 🔥</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px"><span style="color:var(--text-muted)">Last Active</span><span id="sum-active" style="font-weight:500">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENTS -->
+    <div class="card" style="margin-bottom:24px">
+      <div style="font-size:15px;font-weight:600;margin-bottom:16px">🏆 Achievements</div>
+      <div id="achievements" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px"></div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="card" style="margin-bottom:24px">
+      <div style="font-size:15px;font-weight:600;margin-bottom:16px">Quick Actions</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <a href="chat.html" class="btn-primary btn-sm">💬 Ask a Doubt</a>
+        <a href="study.html" class="btn-purple btn-sm">📚 Study Mode</a>
+        <a href="progress.html" class="btn-secondary btn-sm">📊 View Progress</a>
+        <a href="settings.html" class="btn btn-sm">⚙️ Settings</a>
+      </div>
+    </div>
+
+    <!-- DANGER ZONE -->
+    <div class="card" style="border-color:#FCA5A5">
+      <div style="font-size:15px;font-weight:600;margin-bottom:6px;color:var(--red)">⚠️ Danger Zone</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">These actions cannot be undone.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-danger" onclick="handleLogout()">🚪 Log Out</button>
+        <button class="btn-danger" onclick="clearProgress()">🔄 Reset Progress</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;z-index:200;padding:20px">
+  <div style="background:var(--surface);border-radius:20px;padding:28px;max-width:420px;width:100%;box-shadow:var(--shadow-lg);position:relative">
+    <button onclick="closeEditModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted);line-height:1">×</button>
+    <div style="font-size:18px;font-weight:600;margin-bottom:20px">Edit Profile</div>
+    <div class="form-group">
+      <label class="form-label">Full Name</label>
+      <input type="text" class="form-input" id="edit-name" placeholder="Your name" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Class</label>
+      <select class="form-select" id="edit-class" onchange="handleEditClass()">
+        <option value="6">Class 6</option><option value="7">Class 7</option><option value="8">Class 8</option>
+        <option value="9">Class 9</option><option value="10">Class 10</option><option value="11">Class 11</option><option value="12">Class 12</option>
+      </select>
+    </div>
+    <div class="form-group stream-row" id="edit-stream-row">
+      <label class="form-label">Stream</label>
+      <select class="form-select" id="edit-stream">
+        <option value="Science">Science (PCM/PCB)</option>
+        <option value="Commerce">Commerce</option>
+        <option value="Arts">Arts / Humanities</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
+      <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+if (!EduMind.requireAuth()) {/* redirected */} else {
+  const { Storage, populateDashNav, initMobileNav, formatDate, showToast } = EduMind;
+  populateDashNav();
+  initMobileNav();
+
+  const profile  = Storage.getProfile();
+  const progress = Storage.getProgress();
+
+  // Null-safe name handling
+  const name   = profile.name || 'Student';
+  const initials = name.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0,2) || 'S';
+
+  document.getElementById('profile-avatar-lg').textContent = initials;
+  document.getElementById('prof-name').textContent  = name;
+  document.getElementById('prof-meta').textContent  = `Class ${profile.studentClass}${profile.stream ? ' · ' + profile.stream : ''} · CBSE`;
+  document.getElementById('info-name').textContent  = name;
+  document.getElementById('info-username').textContent = '@' + (profile.username || 'unknown');
+  document.getElementById('info-class').textContent = 'Class ' + profile.studentClass;
+  document.getElementById('info-stream').textContent = profile.stream || 'N/A (Class ≤ 10)';
+  document.getElementById('info-joined').textContent = formatDate(profile.createdAt || profile.lastActive);
+  document.getElementById('sum-sessions').textContent = progress.totalSessions || 0;
+  document.getElementById('sum-hours').textContent    = (progress.totalHours || 0).toFixed(1) + 'h';
+  document.getElementById('sum-chapters').textContent = (profile.completedChapters || []).length;
+  document.getElementById('sum-streak').textContent   = (progress.streakDays || 0) + ' days 🔥';
+  document.getElementById('sum-active').textContent   = formatDate(profile.lastActive);
+
+  // Profile badges
+  const badges = [['🆓', 'Free Learner', 'badge-green'], ['🇮🇳', 'Indian Student', 'badge-blue']];
+  if (progress.totalSessions >= 1)              badges.push(['🎯', 'First Session', 'badge-green']);
+  if (progress.totalSessions >= 10)             badges.push(['🔟', '10 Sessions', 'badge-blue']);
+  if (progress.streakDays >= 3)                 badges.push(['🔥', '3-Day Streak', 'badge-orange']);
+  if ((profile.completedChapters||[]).length>=1)badges.push(['📖', 'Chapter Champion', 'badge-purple']);
+  document.getElementById('prof-badges').innerHTML = badges
+    .map(b => `<span class="badge ${b[2]}">${b[0]} ${b[1]}</span>`).join('');
+
+  // Achievements
+  const achievements = [
+    { emoji:'🚀', title:'First Doubt',     desc:'Asked your first question',     unlocked: progress.totalSessions >= 1 },
+    { emoji:'📅', title:'Consistent',      desc:'Maintained a 3-day streak',     unlocked: progress.streakDays >= 3 },
+    { emoji:'📚', title:'Chapter Master',  desc:'Completed your first chapter',  unlocked: (profile.completedChapters||[]).length >= 1 },
+    { emoji:'⏰', title:'Study Warrior',   desc:'5+ hours of total study time',  unlocked: progress.totalHours >= 5 },
+    { emoji:'🏆', title:'Top Student',     desc:'50+ study sessions',            unlocked: progress.totalSessions >= 50 },
+    { emoji:'⚡', title:'Speed Learner',   desc:'10+ sessions completed',        unlocked: progress.totalSessions >= 10 },
+  ];
+  document.getElementById('achievements').innerHTML = achievements.map(a => `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:${a.unlocked?'var(--green-pale)':'var(--border-light)'};border-radius:12px;opacity:${a.unlocked?1:0.5};transition:opacity 0.2s">
+      <div style="font-size:26px;flex-shrink:0">${a.emoji}</div>
+      <div style="min-width:0">
+        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.title}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${a.desc}</div>
+      </div>
+      ${a.unlocked ? '<div style="margin-left:auto;color:var(--green);font-size:18px;flex-shrink:0">✓</div>' : ''}
+    </div>`).join('');
+
+  // Edit modal
+  function openEditModal() {
+    document.getElementById('edit-name').value  = profile.name || '';
+    document.getElementById('edit-class').value = profile.studentClass || '10';
+    handleEditClass();
+    if (profile.stream) document.getElementById('edit-stream').value = profile.stream;
+    document.getElementById('edit-modal').style.display = 'flex';
+  }
+  function closeEditModal() { document.getElementById('edit-modal').style.display = 'none'; }
+  function handleEditClass() {
+    const cls = parseInt(document.getElementById('edit-class').value);
+    document.getElementById('edit-stream-row').classList.toggle('show', cls >= 11);
+  }
+  function saveProfile() {
+    const newName   = document.getElementById('edit-name').value.trim();
+    const newCls    = document.getElementById('edit-class').value;
+    const newStream = parseInt(newCls) >= 11 ? document.getElementById('edit-stream').value : null;
+    if (!newName) { showToast('Please enter your name', 'error'); return; }
+
+    Storage.updateProfile({ name: newName, studentClass: newCls, stream: newStream });
+
+    // Also update the users store so login info stays in sync
+    try {
+      const users = JSON.parse(localStorage.getItem('edumind_users') || '{}');
+      if (users[profile.username]) {
+        users[profile.username] = { ...users[profile.username], name: newName, studentClass: newCls, stream: newStream };
+        localStorage.setItem('edumind_users', JSON.stringify(users));
+      }
+    } catch(e) { console.warn('Could not update users store', e); }
+
+    closeEditModal();
+    showToast('Profile updated!', 'success');
+    setTimeout(() => location.reload(), 700);
+  }
+
+  function handleLogout() {
+    if (!confirm('Log out of EduMind?')) return;
+    Storage.logout();
+    window.location.href = 'login.html';
+  }
+  function clearProgress() {
+    if (!confirm('Reset all study progress? Sessions, streak, and chapters will be cleared. Cannot be undone.')) return;
+    localStorage.removeItem('edumind_progress');
+    const p = Storage.getProfile();
+    if (p) { p.completedChapters = []; p.weakTopics = []; Storage.setProfile(p); }
+    showToast('Progress reset.', 'success');
+    setTimeout(() => location.reload(), 800);
+  }
+
+  // Close modal on backdrop click
+  document.getElementById('edit-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeEditModal();
+  });
+
+  window.openEditModal  = openEditModal;
+  window.closeEditModal = closeEditModal;
+  window.handleEditClass = handleEditClass;
+  window.saveProfile    = saveProfile;
+  window.handleLogout   = handleLogout;
+  window.clearProgress  = clearProgress;
+}
+</script>
+</body>
+</html>

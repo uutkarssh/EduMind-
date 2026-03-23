@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — EduMind</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="dash-nav-left">
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon"><svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      EduMind
+    </a>
+    <ul class="dash-nav-links">
+      <li><a href="dashboard.html">🏠 Home</a></li>
+      <li><a href="chat.html">💬 Ask Doubt</a></li>
+      <li><a href="study.html">📚 Study</a></li>
+      <li><a href="subjects.html">🧪 Subjects</a></li>
+      <li><a href="progress.html">📊 Progress</a></li>
+    </ul>
+  </div>
+  <a href="profile.html" class="nav-user">
+    <div class="nav-avatar" id="nav-avatar">A</div>
+    <div>
+      <div class="nav-user-name" id="nav-name">Student</div>
+      <div class="nav-user-class" id="nav-class">Class 10</div>
+    </div>
+  </a>
+</nav>
+
+<div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <a href="dashboard.html">🏠 Home</a>
+  <a href="chat.html">💬 Ask Doubt</a>
+  <a href="study.html">📚 Study</a>
+  <a href="subjects.html">🧪 Subjects</a>
+  <a href="progress.html">📊 Progress</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="settings.html" class="active">⚙️ Settings</a>
+</div>
+
+<div class="dash-page">
+  <div class="dash-header">
+    <h1 class="dash-title">Settings</h1>
+    <p class="dash-subtitle">Manage your preferences and account</p>
+  </div>
+
+  <div class="settings-layout">
+    <!-- LEFT NAV -->
+    <div class="settings-nav">
+      <button class="settings-nav-item active" onclick="switchSection('ai',this)"><span class="nav-icon">🤖</span> AI &amp; API</button>
+      <button class="settings-nav-item" onclick="switchSection('appearance',this)"><span class="nav-icon">🎨</span> Appearance</button>
+      <button class="settings-nav-item" onclick="switchSection('notifications',this)"><span class="nav-icon">🔔</span> Notifications</button>
+      <button class="settings-nav-item" onclick="switchSection('privacy',this)"><span class="nav-icon">🔒</span> Privacy</button>
+      <button class="settings-nav-item" onclick="switchSection('shortcuts',this)"><span class="nav-icon">⌨️</span> Shortcuts</button>
+      <button class="settings-nav-item" onclick="switchSection('data',this)"><span class="nav-icon">💾</span> Data</button>
+      <button class="settings-nav-item" onclick="switchSection('danger',this)"><span class="nav-icon">⚠️</span> Danger Zone</button>
+    </div>
+
+    <!-- RIGHT CONTENT -->
+    <div class="settings-content">
+
+      <!-- AI & API -->
+      <div class="settings-section active" id="section-ai">
+        <div class="section-header">
+          <h2>AI &amp; API Settings</h2>
+          <p>Configure the AI model and how it interacts with you</p>
+        </div>
+        <div class="section-body">
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Grok API Key</label>
+              <p>Your xAI API key. Used to power AI responses. Keep this private.</p>
+              <div style="margin-top:10px">
+                <span class="status-badge disconnected" id="apiStatusBadge"><span class="status-dot"></span><span id="apiStatusText">Checking…</span></span>
+              </div>
+            </div>
+            <div class="setting-control">
+              <div class="api-key-wrapper">
+                <input type="password" id="apiKeyInput" placeholder="xai-…" autocomplete="off" oninput="markDirty()" />
+                <button class="api-key-toggle" onclick="toggleKeyVis()" id="apiKeyToggleBtn">👁️</button>
+              </div>
+              <div class="api-key-actions">
+                <button class="btn-primary btn-sm" onclick="saveApiKey()">Save Key</button>
+                <button class="btn btn-sm" onclick="testApiKey()">Test</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>AI Model</label>
+              <p>Grok 3 Mini is fast and cost-efficient for everyday tutoring.</p>
+            </div>
+            <div class="setting-control">
+              <select class="setting-select" id="modelSelect" onchange="markDirty()">
+                <option value="grok-3-mini">Grok 3 Mini (Fast)</option>
+                <option value="grok-3">Grok 3 (Powerful)</option>
+                <option value="grok-2">Grok 2</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Response Language</label>
+              <p>Language the AI uses to explain concepts.</p>
+            </div>
+            <div class="setting-control">
+              <select class="setting-select" id="languageSelect" onchange="markDirty()">
+                <option value="english">English</option>
+                <option value="hinglish">Hinglish (Hindi + English)</option>
+                <option value="hindi">Hindi</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Explanation Style</label>
+              <p>How the AI structures its answers.</p>
+            </div>
+            <div class="setting-control">
+              <select class="setting-select" id="styleSelect" onchange="markDirty()">
+                <option value="detailed">Detailed with examples</option>
+                <option value="concise">Concise and direct</option>
+                <option value="stepwise">Step-by-step</option>
+                <option value="socratic">Socratic (asks you questions)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Include Practice Questions</label>
+              <p>After explaining a concept, AI will suggest practice problems.</p>
+            </div>
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="togglePractice" onchange="markDirty()" checked />
+                <div class="toggle-track"></div><div class="toggle-thumb"></div>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Exam-Focused Mode</label>
+              <p>AI prioritises board exam tips, shortcuts, and past year questions.</p>
+            </div>
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggleExamMode" onchange="markDirty()" />
+                <div class="toggle-track"></div><div class="toggle-thumb"></div>
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- APPEARANCE -->
+      <div class="settings-section" id="section-appearance">
+        <div class="section-header">
+          <h2>Appearance</h2>
+          <p>Personalise how EduMind looks</p>
+        </div>
+        <div class="section-body">
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Theme</label>
+              <p>Choose a colour theme for the app.</p>
+            </div>
+            <div class="setting-control">
+              <div class="theme-options">
+                <div class="theme-card theme-light selected" id="theme-light" onclick="selectTheme('light')">
+                  <div class="theme-preview"><div class="tp-bar wide"></div><div class="tp-bar mid"></div><div class="tp-bar short"></div></div>
+                  <div class="theme-card-label">Light</div>
+                </div>
+                <div class="theme-card theme-dark" id="theme-dark" onclick="selectTheme('dark')">
+                  <div class="theme-preview"><div class="tp-bar wide"></div><div class="tp-bar mid"></div><div class="tp-bar short"></div></div>
+                  <div class="theme-card-label">Dark</div>
+                </div>
+                <div class="theme-card theme-sepia" id="theme-sepia" onclick="selectTheme('sepia')">
+                  <div class="theme-preview"><div class="tp-bar wide"></div><div class="tp-bar mid"></div><div class="tp-bar short"></div></div>
+                  <div class="theme-card-label">Sepia</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Chat Font Size</label>
+              <p>Adjust text size in the AI chat window.</p>
+            </div>
+            <div class="setting-control">
+              <div class="font-size-control">
+                <button onclick="changeFontSize(-1)">−</button>
+                <span class="font-size-value" id="fontSizeValue">16px</span>
+                <button onclick="changeFontSize(1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Animate Responses</label>
+              <p>AI responses stream in character by character.</p>
+            </div>
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggleAnimate" onchange="markDirty()" checked />
+                <div class="toggle-track"></div><div class="toggle-thumb"></div>
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="settings-section" id="section-notifications">
+        <div class="section-header">
+          <h2>Notifications</h2>
+          <p>Control what reminders and alerts you receive</p>
+        </div>
+        <div class="section-body">
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Daily Study Reminders</label>
+              <p>Get a reminder every day to maintain your streak.</p>
+            </div>
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggleDailyReminder" onchange="markDirty()" checked />
+                <div class="toggle-track"></div><div class="toggle-thumb"></div>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Reminder Time</label>
+              <p>When should EduMind remind you to study?</p>
+            </div>
+            <div class="setting-control">
+              <select class="setting-select" id="reminderTime" onchange="markDirty()">
+                <option value="07:00">7:00 AM</option>
+                <option value="08:00">8:00 AM</option>
+                <option value="17:00" selected>5:00 PM</option>
+                <option value="18:00">6:00 PM</option>
+                <option value="19:00">7:00 PM</option>
+                <option value="20:00">8:00 PM</option>
+                <option value="21:00">9:00 PM</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Achievement Notifications</label>
+              <p>Pop-up when you unlock a new badge or achievement.</p>
+            </div>
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggleAchievements" onchange="markDirty()" checked />
+                <div class="toggle-track"></div><div class="toggle-thumb"></div>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Streak Warnings</label>
+              <p>Alert me if I haven't studied and my streak is at risk.</p>
+            </div>
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggleStreakWarn" onchange="markDirty()" checked />
+                <div class="toggle-track"></div><div class="toggle-thumb"></div>
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PRIVACY -->
+      <div class="settings-section" id="section-privacy">
+        <div class="section-header">
+          <h2>Privacy</h2>
+          <p>Control your data and what gets stored</p>
+        </div>
+        <div class="section-body">
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Save Chat History</label>
+              <p>Store past conversations so you can revisit them.</p>
+            </div>
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggleSaveChats" onchange="markDirty()" checked />
+                <div class="toggle-track"></div><div class="toggle-thumb"></div>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Track Study Progress</label>
+              <p>Record sessions, chapters completed, and time studied.</p>
+            </div>
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" id="toggleTrackProgress" onchange="markDirty()" checked />
+                <div class="toggle-track"></div><div class="toggle-thumb"></div>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Data Storage</label>
+              <p>All data is stored locally in your browser. Nothing is sent to any server except your AI queries to xAI (Grok).</p>
+            </div>
+            <div class="setting-control">
+              <span class="status-badge connected"><span class="status-dot"></span>Local only</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SHORTCUTS -->
+      <div class="settings-section" id="section-shortcuts">
+        <div class="section-header">
+          <h2>Keyboard Shortcuts</h2>
+          <p>Speed up your workflow</p>
+        </div>
+        <div class="section-body">
+          <div class="shortcuts-grid">
+            <div class="shortcut-row"><span>Send message</span><div><kbd>Enter</kbd></div></div>
+            <div class="shortcut-row"><span>New line in chat</span><div><kbd>Shift</kbd> + <kbd>Enter</kbd></div></div>
+            <div class="shortcut-row"><span>New chat</span><div><kbd>Ctrl</kbd> + <kbd>N</kbd></div></div>
+            <div class="shortcut-row"><span>Go to dashboard</span><div><kbd>Ctrl</kbd> + <kbd>H</kbd></div></div>
+            <div class="shortcut-row"><span>Focus chat input</span><div><kbd>/</kbd></div></div>
+            <div class="shortcut-row"><span>Open settings</span><div><kbd>Ctrl</kbd> + <kbd>,</kbd></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA -->
+      <div class="settings-section" id="section-data">
+        <div class="section-header">
+          <h2>Data Management</h2>
+          <p>Export or clear your EduMind data</p>
+        </div>
+        <div class="section-body">
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Export All Data</label>
+              <p>Download a JSON backup of all your chats, progress, and settings.</p>
+            </div>
+            <div class="setting-control">
+              <button class="btn btn-sm" onclick="exportData()">📥 Export</button>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Import Data</label>
+              <p>Restore from a previously exported EduMind JSON file.</p>
+            </div>
+            <div class="setting-control">
+              <label class="btn btn-sm" style="cursor:pointer">
+                📤 Import
+                <input type="file" accept=".json" style="display:none" onchange="importData(this)" />
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Storage Used</label>
+              <p>How much localStorage space EduMind is using.</p>
+            </div>
+            <div class="setting-control">
+              <span style="font-size:14px;font-weight:600;color:var(--purple)" id="storageUsed">Calculating…</span>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Clear Chat History</label>
+              <p>Delete all saved chat conversations. Progress data will not be affected.</p>
+            </div>
+            <div class="setting-control">
+              <button class="btn-danger" onclick="clearChats()">Clear Chats</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- DANGER ZONE -->
+      <div class="settings-section danger-zone" id="section-danger">
+        <div class="section-header">
+          <h2>⚠️ Danger Zone</h2>
+          <p>These actions are irreversible. Please be certain before proceeding.</p>
+        </div>
+        <div class="section-body">
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Reset Progress</label>
+              <p>Clear all study progress, streaks, chapters, and weekly stats. Your account and chats remain.</p>
+            </div>
+            <div class="setting-control">
+              <button class="btn-danger" onclick="resetProgress()">Reset Progress</button>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Log Out</label>
+              <p>Sign out of your account on this device.</p>
+            </div>
+            <div class="setting-control">
+              <button class="btn-danger" onclick="logout()">Log Out</button>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label>Delete Account</label>
+              <p>Permanently delete your EduMind account and all data from this device. Cannot be undone.</p>
+            </div>
+            <div class="setting-control">
+              <button class="btn-danger" style="border-color:#DC2626;background:#FEE2E2" onclick="deleteAccount()">Delete Account</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- end settings-content -->
+  </div><!-- end settings-layout -->
+</div><!-- end dash-page -->
+
+<!-- Save bar -->
+<div class="save-bar" id="saveBar">
+  <span>Unsaved changes</span>
+  <button class="btn-discard" onclick="discardChanges()">Discard</button>
+  <button class="btn-save" onclick="saveAllSettings()">Save</button>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+if (!EduMind.requireAuth()) {/* redirected */} else {
+  EduMind.populateDashNav();
+  EduMind.initMobileNav();
+
+  const SETTINGS_KEY = 'edumind_settings';
+  let isDirty = false;
+  let savedSettings = {};
+  let currentFontSize = 16;
+  let currentTheme    = 'light';
+
+  const DEFAULTS = {
+    apiKey: 'xai-jZXRNkmc4oqvdTuPJQGbEzcYqcSlbKA0QW5boB8eATpNQShRcUVQnT7O18rE3z7cc6pNddJIeg88BKLL',
+    model: 'grok-3-mini', language: 'english', style: 'detailed',
+    practice: true, examMode: false, theme: 'light', fontSize: 16,
+    animate: true, dailyReminder: true, reminderTime: '17:00',
+    achievements: true, streakWarn: true,
+    saveChats: true, trackProgress: true,
+  };
+
+  function loadSettings() {
+    try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }; }
+    catch { return { ...DEFAULTS }; }
+  }
+
+  function applyToUI(s) {
+    document.getElementById('apiKeyInput').value        = s.apiKey || '';
+    document.getElementById('modelSelect').value        = s.model || 'grok-3-mini';
+    document.getElementById('languageSelect').value     = s.language || 'english';
+    document.getElementById('styleSelect').value        = s.style || 'detailed';
+    document.getElementById('togglePractice').checked   = s.practice !== false;
+    document.getElementById('toggleExamMode').checked   = !!s.examMode;
+    document.getElementById('toggleAnimate').checked    = s.animate !== false;
+    document.getElementById('toggleDailyReminder').checked = s.dailyReminder !== false;
+    document.getElementById('reminderTime').value       = s.reminderTime || '17:00';
+    document.getElementById('toggleAchievements').checked = s.achievements !== false;
+    document.getElementById('toggleStreakWarn').checked = s.streakWarn !== false;
+    document.getElementById('toggleSaveChats').checked  = s.saveChats !== false;
+    document.getElementById('toggleTrackProgress').checked = s.trackProgress !== false;
+    currentFontSize = s.fontSize || 16;
+    document.getElementById('fontSizeValue').textContent = currentFontSize + 'px';
+    currentTheme = s.theme || 'light';
+    selectThemeUI(currentTheme);
+    updateApiStatus(s.apiKey);
+  }
+
+  function collectSettings() {
+    return {
+      apiKey: document.getElementById('apiKeyInput').value.trim(),
+      model: document.getElementById('modelSelect').value,
+      language: document.getElementById('languageSelect').value,
+      style: document.getElementById('styleSelect').value,
+      practice: document.getElementById('togglePractice').checked,
+      examMode: document.getElementById('toggleExamMode').checked,
+      theme: currentTheme, fontSize: currentFontSize,
+      animate: document.getElementById('toggleAnimate').checked,
+      dailyReminder: document.getElementById('toggleDailyReminder').checked,
+      reminderTime: document.getElementById('reminderTime').value,
+      achievements: document.getElementById('toggleAchievements').checked,
+      streakWarn: document.getElementById('toggleStreakWarn').checked,
+      saveChats: document.getElementById('toggleSaveChats').checked,
+      trackProgress: document.getElementById('toggleTrackProgress').checked,
+    };
+  }
+
+  function markDirty() {
+    if (!isDirty) {
+      isDirty = true;
+      document.getElementById('saveBar').classList.add('visible');
+    }
+  }
+
+  function saveAllSettings() {
+    const s = collectSettings();
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+    savedSettings = { ...s };
+    isDirty = false;
+    document.getElementById('saveBar').classList.remove('visible');
+    EduMind.showToast('Settings saved!', 'success');
+    updateApiStatus(s.apiKey);
+  }
+
+  function discardChanges() {
+    applyToUI(savedSettings);
+    isDirty = false;
+    document.getElementById('saveBar').classList.remove('visible');
+  }
+
+  function switchSection(name, btn) {
+    document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.settings-nav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('section-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // API Key
+  function toggleKeyVis() {
+    const inp = document.getElementById('apiKeyInput');
+    const btn = document.getElementById('apiKeyToggleBtn');
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+    else { inp.type = 'password'; btn.textContent = '👁️'; }
+  }
+
+  function saveApiKey() {
+    const key = document.getElementById('apiKeyInput').value.trim();
+    if (!key) { EduMind.showToast('Enter an API key first', 'error'); return; }
+    const s = loadSettings(); s.apiKey = key;
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+    updateApiStatus(key);
+    EduMind.showToast('API key saved!', 'success');
+  }
+
+  async function testApiKey() {
+    const key = document.getElementById('apiKeyInput').value.trim();
+    if (!key) { EduMind.showToast('Enter a key first', 'error'); return; }
+    const badge = document.getElementById('apiStatusBadge');
+    badge.className = 'status-badge';
+    badge.innerHTML = '<span class="status-dot"></span> Testing…';
+    try {
+      const res = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+        body: JSON.stringify({ model: 'grok-3-mini', max_tokens: 5, messages: [{ role: 'user', content: 'Hi' }] })
+      });
+      if (res.ok) {
+        badge.className = 'status-badge connected';
+        badge.innerHTML = '<span class="status-dot"></span> Connected ✓';
+        EduMind.showToast('API key is valid!', 'success');
+      } else {
+        badge.className = 'status-badge disconnected';
+        badge.innerHTML = '<span class="status-dot"></span> Invalid key';
+        EduMind.showToast('API key invalid', 'error');
+      }
+    } catch {
+      badge.className = 'status-badge disconnected';
+      badge.innerHTML = '<span class="status-dot"></span> Connection failed';
+      EduMind.showToast('Could not reach xAI', 'error');
+    }
+  }
+
+  function updateApiStatus(key) {
+    const badge = document.getElementById('apiStatusBadge');
+    if (key && key.startsWith('xai-') && key.length > 20) {
+      badge.className = 'status-badge connected';
+      badge.innerHTML = '<span class="status-dot"></span> Key saved';
+    } else {
+      badge.className = 'status-badge disconnected';
+      badge.innerHTML = '<span class="status-dot"></span> No key set';
+    }
+  }
+
+  // Theme
+  function selectTheme(t) { currentTheme = t; selectThemeUI(t); markDirty(); }
+  function selectThemeUI(t) {
+    document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+    const el = document.getElementById('theme-' + t);
+    if (el) el.classList.add('selected');
+  }
+
+  // Font size
+  function changeFontSize(d) {
+    currentFontSize = Math.max(12, Math.min(22, currentFontSize + d));
+    document.getElementById('fontSizeValue').textContent = currentFontSize + 'px';
+    markDirty();
+  }
+
+  // Storage size
+  function calcStorage() {
+    let total = 0;
+    for (let k in localStorage) {
+      if (Object.prototype.hasOwnProperty.call(localStorage, k) && k.startsWith('edumind')) {
+        total += (localStorage[k].length + k.length) * 2;
+      }
+    }
+    const el = document.getElementById('storageUsed');
+    if (el) el.textContent = (total / 1024).toFixed(1) + ' KB';
+  }
+
+  // Export
+  function exportData() {
+    const data = {};
+    for (let k in localStorage) {
+      if (Object.prototype.hasOwnProperty.call(localStorage, k) && k.startsWith('edumind')) {
+        try { data[k] = JSON.parse(localStorage[k]); } catch { data[k] = localStorage[k]; }
+      }
+    }
+    const a   = document.createElement('a');
+    a.href    = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+    a.download = 'edumind-backup-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    EduMind.showToast('Data exported!', 'success');
+  }
+
+  function importData(input) {
+    const file = input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (!confirm('This will overwrite your current EduMind data. Continue?')) return;
+        for (let k in data) localStorage.setItem(k, typeof data[k] === 'string' ? data[k] : JSON.stringify(data[k]));
+        EduMind.showToast('Data imported!', 'success');
+        setTimeout(() => location.reload(), 800);
+      } catch { EduMind.showToast('Invalid backup file', 'error'); }
+    };
+    reader.readAsText(file);
+  }
+
+  // Danger zone
+  function clearChats() {
+    if (!confirm('Delete all saved chat conversations? This cannot be undone.')) return;
+    Object.keys(localStorage).filter(k => k.startsWith('edumind_chat_') || k === 'edumind_chatlist').forEach(k => localStorage.removeItem(k));
+    EduMind.showToast('Chat history cleared', 'success');
+    calcStorage();
+  }
+
+  function resetProgress() {
+    if (!confirm('Reset all study progress? Streaks, chapters, and sessions will be cleared.')) return;
+    localStorage.removeItem('edumind_progress');
+    const profile = EduMind.Storage.getProfile();
+    if (profile) { profile.completedChapters = []; profile.weakTopics = []; EduMind.Storage.setProfile(profile); }
+    EduMind.showToast('Progress reset', 'success');
+  }
+
+  function logout() {
+    if (!confirm('Log out of EduMind?')) return;
+    EduMind.Storage.logout();
+    window.location.href = 'login.html';
+  }
+
+  function deleteAccount() {
+    const username = prompt('Type your username to confirm deletion:');
+    if (!username) return;
+    const user = EduMind.Storage.getUser();
+    if (!user || username !== user.username) { EduMind.showToast('Username did not match', 'error'); return; }
+    try {
+      const users = JSON.parse(localStorage.getItem('edumind_users') || '{}');
+      delete users[username];
+      localStorage.setItem('edumind_users', JSON.stringify(users));
+    } catch {}
+    Object.keys(localStorage).filter(k => k.startsWith('edumind') && k !== 'edumind_users').forEach(k => localStorage.removeItem(k));
+    EduMind.showToast('Account deleted', 'success');
+    setTimeout(() => window.location.href = 'login.html', 800);
+  }
+
+  // Init
+  const s = loadSettings();
+  savedSettings = { ...s };
+  applyToUI(s);
+  calcStorage();
+  document.getElementById('apiKeyInput').addEventListener('input', markDirty);
+}
+</script>
+</body>
+</html>

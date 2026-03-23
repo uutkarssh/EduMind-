@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up — EduMind</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon"><svg viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <span class="auth-logo-text">EduMind</span>
+    </div>
+
+    <div class="auth-title">Create your account</div>
+    <div class="auth-sub">Start learning with your personal AI tutor — free forever.</div>
+
+    <div id="step1">
+      <div class="form-group">
+        <label class="form-label">Your Full Name</label>
+        <input type="text" class="form-input" id="inp-name" placeholder="e.g. Priya Sharma" autocomplete="name" />
+        <div class="form-error" id="err-name">Please enter your name</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Your Class</label>
+        <select class="form-select" id="inp-class" onchange="handleClassChange()">
+          <option value="">Select your class</option>
+          <option value="6">Class 6</option>
+          <option value="7">Class 7</option>
+          <option value="8">Class 8</option>
+          <option value="9">Class 9</option>
+          <option value="10">Class 10</option>
+          <option value="11">Class 11</option>
+          <option value="12">Class 12</option>
+        </select>
+        <div class="form-error" id="err-class">Please select your class</div>
+      </div>
+
+      <div class="form-group stream-row" id="stream-row">
+        <label class="form-label">Your Stream</label>
+        <select class="form-select" id="inp-stream">
+          <option value="">Select your stream</option>
+          <option value="Science">Science (PCM / PCB)</option>
+          <option value="Commerce">Commerce</option>
+          <option value="Arts">Arts / Humanities</option>
+        </select>
+        <div class="form-error" id="err-stream">Please select your stream</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input type="text" class="form-input" id="inp-username" placeholder="e.g. priya2025" autocomplete="username" />
+        <div class="form-hint">This will be your login ID (letters, numbers, underscores)</div>
+        <div class="form-error" id="err-username">Username must be at least 3 characters</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="inp-password" placeholder="At least 6 characters" autocomplete="new-password" />
+        <div class="form-error" id="err-password">Password must be at least 6 characters</div>
+      </div>
+
+      <button class="btn-primary btn-full" onclick="handleSignup()">
+        Create Account
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <!-- Success -->
+    <div id="step2" style="display:none;text-align:center;padding:20px 0">
+      <div style="font-size:48px;margin-bottom:16px">🎉</div>
+      <div style="font-size:20px;font-weight:600;margin-bottom:8px" id="welcome-msg">Welcome!</div>
+      <div style="font-size:14px;color:var(--text-muted);margin-bottom:24px">Your account is ready. Let's start learning!</div>
+      <div class="spinner" style="margin:0 auto;border-color:rgba(76,175,80,0.3);border-top-color:var(--green)"></div>
+    </div>
+
+    <div class="auth-footer">Already have an account? <a href="login.html">Log in</a></div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  EduMind.redirectIfLoggedIn('dashboard.html');
+
+  function handleClassChange() {
+    const cls = parseInt(document.getElementById('inp-class').value);
+    document.getElementById('stream-row').classList.toggle('show', cls >= 11);
+  }
+
+  function handleSignup() {
+    const name     = document.getElementById('inp-name').value.trim();
+    const cls      = document.getElementById('inp-class').value;
+    const stream   = document.getElementById('inp-stream').value;
+    const username = document.getElementById('inp-username').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+    const password = document.getElementById('inp-password').value;
+
+    document.querySelectorAll('.form-error').forEach(e => e.classList.remove('show'));
+    let valid = true;
+
+    if (name.length < 2)    { document.getElementById('err-name').textContent = 'Please enter your full name'; document.getElementById('err-name').classList.add('show'); valid = false; }
+    if (!cls)               { document.getElementById('err-class').classList.add('show'); valid = false; }
+    if (parseInt(cls) >= 11 && !stream) { document.getElementById('err-stream').classList.add('show'); valid = false; }
+    if (username.length < 3){ document.getElementById('err-username').textContent = 'Username must be at least 3 characters'; document.getElementById('err-username').classList.add('show'); valid = false; }
+    if (password.length < 6){ document.getElementById('err-password').classList.add('show'); valid = false; }
+    if (!valid) return;
+
+    let users = {};
+    try { users = JSON.parse(localStorage.getItem('edumind_users') || '{}'); } catch {}
+    if (users[username]) {
+      document.getElementById('err-username').textContent = 'This username is already taken';
+      document.getElementById('err-username').classList.add('show');
+      return;
+    }
+
+    users[username] = { password, name, studentClass: cls, stream: parseInt(cls) >= 11 ? stream : null, createdAt: new Date().toISOString() };
+    localStorage.setItem('edumind_users', JSON.stringify(users));
+
+    EduMind.Storage.setUser({ username, loggedIn: true });
+    EduMind.Storage.setProfile({
+      name, studentClass: cls,
+      stream: parseInt(cls) >= 11 ? stream : null,
+      username, weakTopics: [], completedChapters: [],
+      lastActive: new Date().toISOString(), createdAt: new Date().toISOString()
+    });
+
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    document.getElementById('welcome-msg').textContent = `Welcome, ${name.split(' ')[0]}! 🎉`;
+
+    setTimeout(() => window.location.href = 'dashboard.html', 1500);
+  }
+</script>
+</body>
+</html>

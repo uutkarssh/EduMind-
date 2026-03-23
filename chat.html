@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ask a Doubt — EduMind</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="dash-nav-left">
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon"><svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      EduMind
+    </a>
+    <ul class="dash-nav-links">
+      <li><a href="dashboard.html">🏠 Home</a></li>
+      <li><a href="chat.html" class="active">💬 Ask Doubt</a></li>
+      <li><a href="study.html">📚 Study</a></li>
+      <li><a href="subjects.html">🧪 Subjects</a></li>
+      <li><a href="progress.html">📊 Progress</a></li>
+    </ul>
+  </div>
+  <a href="profile.html" class="nav-user">
+    <div class="nav-avatar" id="nav-avatar">A</div>
+    <div>
+      <div class="nav-user-name" id="nav-name">Student</div>
+      <div class="nav-user-class" id="nav-class">Class 10</div>
+    </div>
+  </a>
+</nav>
+
+<div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <a href="dashboard.html">🏠 Home</a>
+  <a href="chat.html" class="active">💬 Ask Doubt</a>
+  <a href="study.html">📚 Study</a>
+  <a href="subjects.html">🧪 Subjects</a>
+  <a href="progress.html">📊 Progress</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="settings.html">⚙️ Settings</a>
+</div>
+
+<div class="chat-layout">
+  <!-- SIDEBAR -->
+  <div class="chat-sidebar">
+    <div class="chat-sidebar-header">
+      <div class="chat-sidebar-title">Your Chats</div>
+      <div class="chat-sidebar-sub">Recent conversations</div>
+    </div>
+    <div class="chat-history-list" id="chat-history-list">
+      <div style="padding:20px;text-align:center;font-size:13px;color:var(--text-muted)">No previous chats</div>
+    </div>
+    <div class="chat-sidebar-footer">
+      <button class="btn-primary btn-full btn-sm" onclick="startNewChat()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Chat
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CHAT -->
+  <div class="chat-main">
+    <div class="chat-header">
+      <div style="min-width:0;flex:1">
+        <div class="chat-header-title" id="chat-title">New Conversation</div>
+        <div class="chat-header-sub" id="chat-sub">Ask any question · AI answers at your level</div>
+      </div>
+      <div class="mode-tabs">
+        <button class="mode-tab doubt active" id="tab-doubt" onclick="switchMode('doubt')">💡 Doubt</button>
+        <button class="mode-tab study" id="tab-study" onclick="switchMode('study')">📖 Study</button>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages"></div>
+
+    <div class="chat-input-area">
+      <div class="chat-suggestions" id="suggestions"></div>
+      <div class="chat-input-box">
+        <textarea class="chat-textarea" id="chat-input" placeholder="Ask your doubt here… (e.g. Why does ice float on water?)" rows="1"></textarea>
+        <button class="chat-send-btn" id="send-btn" onclick="sendMessage()" title="Send (Enter)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+if (!EduMind.requireAuth()) {/* redirected */} else {
+  const { Storage, buildSystemPrompt, callGrokAPI, renderText, populateDashNav, initMobileNav, showToast, timeAgo } = EduMind;
+  populateDashNav();
+  initMobileNav();
+
+  const profile = Storage.getProfile();
+  let currentMode   = 'doubt';
+  let currentChatId = null;
+  let chatMessages  = [];
+  let isLoading     = false;
+
+  // Load chat from URL param
+  const urlChatId = new URLSearchParams(window.location.search).get('id');
+
+  function genId() { return 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2,6); }
+
+  function startNewChat() {
+    currentChatId = genId();
+    chatMessages  = [];
+    document.getElementById('chat-messages').innerHTML = '';
+    document.getElementById('chat-title').textContent  = 'New Conversation';
+    showWelcome();
+    updateChatHistory();
+    // Update URL without reload
+    history.replaceState(null, '', 'chat.html');
+  }
+
+  function showWelcome() {
+    const firstName = (profile.name || 'Student').split(' ')[0];
+    const welcome = currentMode === 'doubt'
+      ? `Hi <strong>${firstName}</strong>! 👋 I'm your EduMind AI tutor.<br><br>You're in <span class="step-badge">💡 Doubt Mode</span><br><br>Ask me <strong>any question</strong> from your Class ${profile.studentClass} syllabus${profile.stream ? ' (' + profile.stream + ')' : ''}. I'll explain it step by step!`
+      : `Hi <strong>${firstName}</strong>! 👋 You're in <span class="step-badge">📖 Study Mode</span><br><br>Tell me which <strong>chapter or topic</strong> you want to learn and I'll teach it step by step, checking your understanding at each stage.`;
+    addAIMessage(welcome);
+    loadSuggestions();
+  }
+
+  function loadSuggestions() {
+    const cls = parseInt(profile.studentClass);
+    const s   = profile.stream;
+    let chips = [];
+    if (currentMode === 'doubt') {
+      if (cls <= 8)         chips = ['What is photosynthesis?', "Explain Newton's first law", 'What is a fraction?', 'How does rain form?'];
+      else if (cls <= 10)   chips = ["Explain Ohm's Law", 'What is a quadratic equation?', 'How does a battery work?', 'Explain DNA replication'];
+      else if (s==='Science') chips = ["Explain Gauss's Law", 'What is integration?', 'How does a capacitor work?', "Explain Le Chatelier's principle"];
+      else if (s==='Commerce') chips = ['Explain journal entries', 'What is GDP?', 'Explain demand and supply', 'What is depreciation?'];
+      else chips = ['Explain federalism', 'What is globalisation?', 'How to write an essay?', 'Explain the French Revolution'];
+    } else {
+      if (cls <= 8)         chips = ['Teach me: Force and Motion', 'Teach me: Cells and Life', 'Teach me: Fractions', 'Teach me: Water Cycle'];
+      else if (cls <= 10)   chips = ['Teach me: Light Reflection', 'Teach me: Chemical Reactions', 'Teach me: Polynomials', 'Teach me: Heredity'];
+      else if (s==='Science') chips = ['Teach me: Electrostatics', 'Teach me: Calculus basics', 'Teach me: Organic Chemistry', 'Teach me: Genetics'];
+      else chips = ['Teach me: Macro Economics', 'Teach me: Accounting basics', 'Teach me: Indian History', 'Teach me: Political Theory'];
+    }
+    document.getElementById('suggestions').innerHTML = chips
+      .map(c => `<button class="chat-suggestion-chip" onclick="useSuggestion(this)">${c}</button>`).join('');
+  }
+
+  function useSuggestion(btn) {
+    document.getElementById('chat-input').value = btn.textContent;
+    sendMessage();
+  }
+
+  function switchMode(mode) {
+    currentMode = mode;
+    document.getElementById('tab-doubt').classList.toggle('active', mode === 'doubt');
+    document.getElementById('tab-doubt').classList.toggle('doubt',  mode === 'doubt');
+    document.getElementById('tab-study').classList.toggle('active', mode === 'study');
+    document.getElementById('tab-study').classList.toggle('study',  mode === 'study');
+    document.getElementById('chat-messages').innerHTML = '';
+    chatMessages = [];
+    showWelcome();
+    document.getElementById('chat-sub').textContent = mode === 'doubt'
+      ? 'Ask any question · AI answers at your level'
+      : 'Structured learning · Topic by topic';
+  }
+
+  function addUserMessage(text) {
+    const initials = (profile.name || 'S').split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+    const msgs = document.getElementById('chat-messages');
+    const div  = document.createElement('div');
+    div.className = 'chat-msg user';
+    div.innerHTML = `<div class="chat-avatar user-av">${initials}</div><div class="chat-bubble">${escapeHtml(text)}</div>`;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    document.getElementById('suggestions').innerHTML = '';
+  }
+
+  function addAIMessage(html) {
+    const msgs = document.getElementById('chat-messages');
+    const div  = document.createElement('div');
+    div.className = 'chat-msg';
+    div.innerHTML = `<div class="chat-avatar ai">AI</div><div class="chat-bubble ai">${html}</div>`;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function addTypingIndicator() {
+    const msgs = document.getElementById('chat-messages');
+    const id   = 'typing_' + Date.now();
+    const div  = document.createElement('div');
+    div.className = 'chat-msg'; div.id = id;
+    div.innerHTML = `<div class="chat-avatar ai">AI</div><div class="chat-bubble ai"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+    return id;
+  }
+
+  function removeTypingIndicator(id) { const el = document.getElementById(id); if (el) el.remove(); }
+
+  function escapeHtml(text) {
+    return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const text  = input.value.trim();
+    if (!text || isLoading) return;
+
+    isLoading = true;
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('send-btn').disabled = true;
+
+    if (!currentChatId) currentChatId = genId();
+
+    addUserMessage(text);
+    chatMessages.push({ role: 'user', content: text });
+
+    // Set title from first message
+    if (chatMessages.length === 1) {
+      const title = text.length > 50 ? text.slice(0,50) + '…' : text;
+      document.getElementById('chat-title').textContent = title;
+      Storage.addChatToList({ id: currentChatId, title, mode: currentMode, updatedAt: new Date().toISOString(), messageCount: 1 });
+    }
+
+    const typingId = addTypingIndicator();
+
+    try {
+      const sysPrompt = buildSystemPrompt(profile, currentMode);
+      const response  = await callGrokAPI(chatMessages, sysPrompt);
+
+      removeTypingIndicator(typingId);
+      addAIMessage(renderText(response));
+
+      chatMessages.push({ role: 'assistant', content: response });
+      Storage.setChatHistory(currentChatId, chatMessages);
+      Storage.addChatToList({ id: currentChatId, updatedAt: new Date().toISOString(), messageCount: chatMessages.length });
+
+      // Record progress
+      Storage.recordStudySession();
+      updateChatHistory();
+
+    } catch (err) {
+      removeTypingIndicator(typingId);
+      addAIMessage(`<span style="color:var(--red)">⚠️ Couldn't connect to AI. Check your internet and try again.</span><br><small style="color:var(--text-muted)">${escapeHtml(err.message)}</small>`);
+      console.error('[EduMind chat error]', err);
+    }
+
+    isLoading = false;
+    document.getElementById('send-btn').disabled = false;
+    input.focus();
+  }
+
+  function updateChatHistory() {
+    const chats = Storage.getChatList();
+    const cont  = document.getElementById('chat-history-list');
+    if (!chats.length) {
+      cont.innerHTML = '<div style="padding:20px;text-align:center;font-size:13px;color:var(--text-muted)">No previous chats</div>';
+      return;
+    }
+    cont.innerHTML = chats.map(c => `
+      <div class="chat-history-item${c.id === currentChatId ? ' active' : ''}" onclick="loadChat('${c.id}')">
+        <div class="chat-history-item-title">${escapeHtml(c.title || 'Conversation')}</div>
+        <div class="chat-history-item-meta">${timeAgo(c.updatedAt)} · ${c.messageCount||0} msgs</div>
+      </div>`).join('');
+  }
+
+  function loadChat(chatId) {
+    currentChatId = chatId;
+    const history = Storage.getChatHistory(chatId);
+    chatMessages  = history.slice(); // copy
+    const msgs = document.getElementById('chat-messages');
+    msgs.innerHTML = '';
+    if (!history.length) { showWelcome(); return; }
+    history.forEach(m => {
+      if (m.role === 'user') addUserMessage(m.content);
+      else addAIMessage(renderText(m.content));
+    });
+    const info = Storage.getChatList().find(c => c.id === chatId);
+    if (info) document.getElementById('chat-title').textContent = info.title || 'Conversation';
+    history.replaceState(null, '', 'chat.html?id=' + chatId);
+    updateChatHistory();
+  }
+
+  // Auto-resize textarea
+  const textarea = document.getElementById('chat-input');
+  textarea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+  textarea.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  // Init
+  if (urlChatId) loadChat(urlChatId);
+  else startNewChat();
+  updateChatHistory();
+
+  // Handle prefill from subjects page (via sessionStorage)
+  const prefill = sessionStorage.getItem('edumind_chat_prefill');
+  if (prefill && !urlChatId) {
+    sessionStorage.removeItem('edumind_chat_prefill');
+    setTimeout(() => {
+      document.getElementById('chat-input').value = prefill;
+    }, 300);
+  }
+}
+</script>
+</body>
+</html>

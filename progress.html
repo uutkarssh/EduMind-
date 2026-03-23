@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Progress — EduMind</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="dash-nav-left">
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon"><svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      EduMind
+    </a>
+    <ul class="dash-nav-links">
+      <li><a href="dashboard.html">🏠 Home</a></li>
+      <li><a href="chat.html">💬 Ask Doubt</a></li>
+      <li><a href="study.html">📚 Study</a></li>
+      <li><a href="subjects.html">🧪 Subjects</a></li>
+      <li><a href="progress.html" class="active">📊 Progress</a></li>
+    </ul>
+  </div>
+  <a href="profile.html" class="nav-user">
+    <div class="nav-avatar" id="nav-avatar">A</div>
+    <div>
+      <div class="nav-user-name" id="nav-name">Student</div>
+      <div class="nav-user-class" id="nav-class">Class 10</div>
+    </div>
+  </a>
+</nav>
+
+<div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <a href="dashboard.html">🏠 Home</a>
+  <a href="chat.html">💬 Ask Doubt</a>
+  <a href="study.html">📚 Study</a>
+  <a href="subjects.html">🧪 Subjects</a>
+  <a href="progress.html" class="active">📊 Progress</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="settings.html">⚙️ Settings</a>
+</div>
+
+<div class="dash-layout">
+  <div class="dash-sidebar">
+    <div class="sidebar-section">
+      <span class="sidebar-section-label">Main</span>
+      <a href="dashboard.html" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a href="chat.html" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Ask a Doubt</a>
+      <a href="progress.html" class="sidebar-link active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progress</a>
+    </div>
+  </div>
+
+  <div class="dash-main">
+    <div class="dash-header">
+      <h1 class="dash-title">Your Learning Progress</h1>
+      <p class="dash-subtitle" id="prog-sub">Track your study habits and improvements</p>
+    </div>
+
+    <div class="stats-grid" style="margin-bottom:28px">
+      <div class="stat-card">
+        <div class="stat-card-icon" style="background:#FEF3C7"><span style="font-size:20px">🔥</span></div>
+        <div class="stat-card-val" id="streak-val">0</div>
+        <div class="stat-card-label">Day Streak</div>
+        <div class="stat-card-change">Keep it up!</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon" style="background:var(--green-pale)"><span style="font-size:20px">📚</span></div>
+        <div class="stat-card-val" id="sessions-val">0</div>
+        <div class="stat-card-label">Total Sessions</div>
+        <div class="stat-card-change">All time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon" style="background:var(--blue-pale)"><span style="font-size:20px">⏱️</span></div>
+        <div class="stat-card-val" id="hours-val">0h</div>
+        <div class="stat-card-label">Hours Studied</div>
+        <div class="stat-card-change">Total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon" style="background:var(--purple-pale)"><span style="font-size:20px">✅</span></div>
+        <div class="stat-card-val" id="chapters-val">0</div>
+        <div class="stat-card-label">Chapters Done</div>
+        <div class="stat-card-change">This year</div>
+      </div>
+    </div>
+
+    <div class="progress-grid">
+      <div class="card">
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px">Score Trend</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Monthly performance estimate</div>
+        <div style="height:200px"><canvas id="scoreChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div style="font-size:15px;font-weight:600;margin-bottom:16px">Subject Mastery</div>
+        <div id="subject-bars"></div>
+      </div>
+      <div class="card">
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px">This Week</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Daily study hours</div>
+        <div style="height:180px"><canvas id="weekChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div style="font-size:15px;font-weight:600;margin-bottom:16px">Completed Chapters</div>
+        <div id="completed-list" style="max-height:240px;overflow-y:auto"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div style="font-size:15px;font-weight:600">Areas to Focus On</div>
+        <a href="chat.html" class="btn-secondary btn-sm">Ask AI for help →</a>
+      </div>
+      <div id="weak-topics-list"></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+if (!EduMind.requireAuth()) {/* redirected */} else {
+  EduMind.populateDashNav();
+  EduMind.initMobileNav();
+
+  const profile  = EduMind.Storage.getProfile();
+  const progress = EduMind.Storage.getProgress();
+
+  document.getElementById('prog-sub').textContent    = `Class ${profile.studentClass}${profile.stream ? ' · ' + profile.stream : ''} · All-time stats`;
+  document.getElementById('streak-val').textContent  = progress.streakDays || 0;
+  document.getElementById('sessions-val').textContent= progress.totalSessions || 0;
+  document.getElementById('hours-val').textContent   = (progress.totalHours || 0).toFixed(1) + 'h';
+  document.getElementById('chapters-val').textContent= (profile.completedChapters || []).length;
+
+  // Score trend (simulated improvement curve)
+  const months = ['Jan','Feb','Mar','Apr','May','Jun'];
+  const base   = 55 + Math.floor(Math.random() * 10);
+  const scores = months.map((_, i) => Math.min(95, base + i * (3 + Math.random() * 3)));
+  new Chart(document.getElementById('scoreChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [
+        { label: 'Your Score', data: scores, borderColor: '#7C3AED', backgroundColor: 'rgba(124,58,237,0.08)', borderWidth: 2.5, pointBackgroundColor: '#7C3AED', pointRadius: 4, tension: 0.4, fill: true },
+        { label: 'Class Avg',  data: months.map(() => 58 + Math.random() * 6), borderColor: '#D1D5DB', backgroundColor: 'transparent', borderWidth: 1.5, pointRadius: 3, borderDash: [5,4], tension: 0.4 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 11, family: 'DM Sans' }, padding: 16 } } }, scales: { x: { grid: { color: '#F3F4F6' }, ticks: { font: { size: 11 }, color: '#9CA3AF' } }, y: { grid: { color: '#F3F4F6' }, ticks: { font: { size: 11 }, color: '#9CA3AF' }, min: 40, max: 100 } } }
+  });
+
+  // Weekly chart — highlight today
+  const todayIdx = (() => { const d = new Date().getDay(); return d === 0 ? 6 : d - 1; })();
+  new Chart(document.getElementById('weekChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets: [{ data: progress.weeklyData || [0,0,0,0,0,0,0], backgroundColor: (progress.weeklyData||[]).map((_, i) => i === todayIdx ? '#4CAF50' : 'rgba(76,175,80,0.3)'), borderRadius: 6 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#9CA3AF' } }, y: { grid: { color: '#F3F4F6' }, ticks: { font: { size: 11 }, color: '#9CA3AF' }, beginAtZero: true } } }
+  });
+
+  // Subject mastery bars
+  const colors = { Mathematics: '#7C3AED', Physics: '#3B82F6', Chemistry: '#4CAF50', Biology: '#F59E0B', English: '#EC4899', 'Social Science': '#0284C7', Economics: '#F97316', Accountancy: '#6366F1' };
+  const subCont = document.getElementById('subject-bars');
+  const subs = progress.subjects || {};
+  const entries = Object.entries(subs).filter(([,v]) => v > 0);
+  if (entries.length) {
+    entries.forEach(([name, pct]) => {
+      subCont.innerHTML += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="font-size:13px;font-weight:500;width:100px;flex-shrink:0">${name}</span>
+        <div style="flex:1;height:8px;border-radius:100px;background:var(--border-light)">
+          <div style="width:${Math.min(pct,100)}%;height:100%;border-radius:100px;background:${colors[name]||'#7C3AED'};transition:width 0.8s ease"></div>
+        </div>
+        <span style="font-size:13px;font-weight:600;width:35px;text-align:right">${pct}%</span>
+      </div>`;
+    });
+  } else {
+    subCont.innerHTML = '<div style="font-size:13px;color:var(--text-muted);text-align:center;padding:20px">Start studying to track subject mastery!</div>';
+  }
+
+  // Completed chapters
+  const completed = profile.completedChapters || [];
+  const compCont  = document.getElementById('completed-list');
+  compCont.innerHTML = completed.length
+    ? completed.map(ch => `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light)"><span style="color:var(--green);font-size:15px">✅</span><span style="font-size:13px;font-weight:500">${ch}</span></div>`).join('')
+    : '<div style="font-size:13px;color:var(--text-muted);text-align:center;padding:20px">No chapters completed yet. Keep studying!</div>';
+
+  // Weak topics
+  const weak     = profile.weakTopics || [];
+  const weakCont = document.getElementById('weak-topics-list');
+  weakCont.innerHTML = weak.length
+    ? '<div style="display:flex;flex-wrap:wrap;gap:8px">' + weak.map(t => `<span class="badge badge-orange">⚠️ ${t}</span>`).join('') + '</div>'
+    : '<div style="font-size:13px;color:var(--text-muted)">No weak topics identified yet. Keep studying and the AI will help identify areas to focus on.</div>';
+}
+</script>
+</body>
+</html>

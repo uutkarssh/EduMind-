@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Mode — EduMind</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="dash-nav-left">
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon"><svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      EduMind
+    </a>
+    <ul class="dash-nav-links">
+      <li><a href="dashboard.html">🏠 Home</a></li>
+      <li><a href="chat.html">💬 Ask Doubt</a></li>
+      <li><a href="study.html" class="active">📚 Study</a></li>
+      <li><a href="subjects.html">🧪 Subjects</a></li>
+      <li><a href="progress.html">📊 Progress</a></li>
+    </ul>
+  </div>
+  <a href="profile.html" class="nav-user">
+    <div class="nav-avatar" id="nav-avatar">A</div>
+    <div>
+      <div class="nav-user-name" id="nav-name">Student</div>
+      <div class="nav-user-class" id="nav-class">Class 10</div>
+    </div>
+  </a>
+</nav>
+
+<div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <a href="dashboard.html">🏠 Home</a>
+  <a href="chat.html">💬 Ask Doubt</a>
+  <a href="study.html" class="active">📚 Study</a>
+  <a href="subjects.html">🧪 Subjects</a>
+  <a href="progress.html">📊 Progress</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="settings.html">⚙️ Settings</a>
+</div>
+
+<div class="study-layout">
+  <!-- CHAPTER SIDEBAR -->
+  <div class="study-sidebar">
+    <div style="font-size:15px;font-weight:600;margin-bottom:4px">Study Mode</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Pick a chapter to begin</div>
+
+    <div style="margin-bottom:12px">
+      <label class="form-label" style="font-size:12px">Subject</label>
+      <select class="form-select" id="subject-sel" onchange="loadChapters()" style="font-size:13px;padding:8px 12px">
+        <option value="">Select subject</option>
+      </select>
+    </div>
+    <div id="chapter-list"></div>
+  </div>
+
+  <!-- STUDY AREA -->
+  <div class="study-main">
+    <div style="padding:14px 20px;border-bottom:1px solid var(--border-light);background:var(--surface);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0">
+      <div style="min-width:0">
+        <div style="font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="study-title">Select a Chapter</div>
+        <div style="font-size:12px;color:var(--text-muted)" id="study-sub">Choose from the sidebar to start learning</div>
+      </div>
+      <span class="badge badge-green" style="flex-shrink:0">📖 Study Mode</span>
+    </div>
+
+    <div class="chat-messages" id="study-messages">
+      <div style="text-align:center;padding:60px 20px;color:var(--text-muted);margin:auto">
+        <div style="font-size:48px;margin-bottom:16px">📚</div>
+        <div style="font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px">Pick a chapter to begin</div>
+        <div style="font-size:14px;line-height:1.6;max-width:360px;margin:0 auto">Select a subject and chapter from the left. The AI will teach you topic by topic, checking your understanding at each step.</div>
+      </div>
+    </div>
+
+    <div id="study-input-area" style="display:none;padding:14px 20px;border-top:1px solid var(--border-light);background:var(--surface);flex-shrink:0">
+      <div class="chat-input-box">
+        <textarea class="chat-textarea" id="study-input" placeholder="Type your answer or ask a question…" rows="1"></textarea>
+        <button class="chat-send-btn" id="study-send-btn" onclick="sendStudyMessage()" title="Send (Enter)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+if (!EduMind.requireAuth()) {/* redirected */} else {
+  const { Storage, buildSystemPrompt, callGrokAPI, renderText, populateDashNav, initMobileNav, showToast } = EduMind;
+  populateDashNav();
+  initMobileNav();
+
+  const profile = Storage.getProfile();
+  const cls     = parseInt(profile.studentClass);
+  const stream  = profile.stream;
+  let studyMessages = [];
+  let isLoading     = false;
+  let currentChapter = null;
+
+  const SUBJECTS = {
+    Mathematics: {
+      6:[`Knowing Our Numbers`,`Whole Numbers`,`Playing with Numbers`,`Basic Geometrical Ideas`,`Fractions`,`Decimals`,`Data Handling`],
+      7:[`Integers`,`Fractions and Decimals`,`Simple Equations`,`Lines and Angles`,`Triangles`,`Ratio and Proportion`,`Perimeter and Area`],
+      8:[`Rational Numbers`,`Linear Equations`,`Understanding Quadrilaterals`,`Practical Geometry`,`Squares and Square Roots`,`Algebraic Expressions`],
+      9:[`Number Systems`,`Polynomials`,`Coordinate Geometry`,`Lines and Angles`,`Triangles`,`Circles`,`Heron's Formula`],
+      10:[`Real Numbers`,`Polynomials`,`Linear Equations`,`Quadratic Equations`,`Arithmetic Progressions`,`Triangles`,`Trigonometry`,`Statistics`],
+      11:[`Sets`,`Relations and Functions`,`Trigonometric Functions`,`Complex Numbers`,`Linear Inequalities`,`Permutations`,`Binomial Theorem`],
+      12:[`Relations and Functions`,`Inverse Trigonometric Functions`,`Matrices`,`Determinants`,`Continuity and Differentiability`,`Application of Derivatives`,`Integrals`,`Probability`]
+    },
+    Physics: {
+      9:[`Motion`,`Force and Laws of Motion`,`Gravitation`,`Work and Energy`,`Sound`],
+      10:[`Light – Reflection and Refraction`,`Human Eye`,`Electricity`,`Magnetic Effects`,`Sources of Energy`],
+      11:[`Physical World`,`Units and Measurements`,`Motion in a Straight Line`,`Laws of Motion`,`Work Energy and Power`,`Gravitation`],
+      12:[`Electric Charges`,`Electrostatic Potential`,`Current Electricity`,`Moving Charges`,`Magnetism`,`Electromagnetic Induction`,`Wave Optics`,`Dual Nature of Radiation`,`Atoms`,`Nuclei`,`Semiconductors`]
+    },
+    Chemistry: {
+      9:[`Matter in Our Surroundings`,`Atoms and Molecules`,`Structure of Atom`],
+      10:[`Chemical Reactions`,`Acids Bases and Salts`,`Metals and Non-metals`,`Carbon Compounds`,`Periodic Classification`],
+      11:[`Some Basic Concepts`,`Structure of Atom`,`Classification of Elements`,`Chemical Bonding`,`States of Matter`,`Thermodynamics`,`Equilibrium`],
+      12:[`Solid State`,`Solutions`,`Electrochemistry`,`Chemical Kinetics`,`Surface Chemistry`,`p-Block Elements`,`d and f Block`,`Coordination Compounds`,`Haloalkanes`,`Alcohols`,`Aldehydes`,`Amines`,`Biomolecules`]
+    },
+    Biology: {
+      9:[`The Fundamental Unit of Life`,`Tissues`,`Diversity in Living Organisms`,`Why do we Fall Ill`,`Natural Resources`],
+      10:[`Life Processes`,`Control and Coordination`,`Reproduction`,`Heredity and Evolution`,`Our Environment`],
+      11:[`The Living World`,`Biological Classification`,`Plant Kingdom`,`Animal Kingdom`,`Cell: The Unit of Life`,`Biomolecules`,`Cell Cycle`,`Transport in Plants`,`Breathing`],
+      12:[`Reproduction in Organisms`,`Human Reproduction`,`Genetics`,`Molecular Basis of Inheritance`,`Evolution`,`Human Health`,`Biotechnology`,`Ecosystem`]
+    },
+    English: {
+      6:[`A Tale of Two Birds`,`The Friendly Mongoose`,`Grammar: Nouns`,`Grammar: Pronouns`,`Writing: Letter`],
+      7:[`Three Questions`,`A Gift of Chappals`,`Grammar: Tenses`,`Writing: Paragraph`,`Poem: The Squirrel`],
+      8:[`The Best Christmas Present`,`The Tsunami`,`Grammar: Voice`,`Grammar: Reported Speech`,`Writing: Essay`],
+      9:[`The Fun They Had`,`The Lost Child`,`The Sound of Music`,`Grammar: Clauses`,`Writing: Story`,`Poem: The Road Not Taken`],
+      10:[`A Letter to God`,`Nelson Mandela`,`Grammar: Editing`,`Writing: Formal Letter`,`Poem: Dust of Snow`],
+      11:[`The Portrait of a Lady`,`A Photograph`,`Grammar: Error Correction`,`Writing: Notice`,`Reading Comprehension`],
+      12:[`The Last Lesson`,`Lost Spring`,`Deep Water`,`Indigo`,`Grammar: Transformation`,`Writing: Report`]
+    },
+    'Social Science': {
+      6:[`What, Where, How and When?`,`On The Trail of the Earliest People`,`Understanding Diversity`,`Government`],
+      7:[`New Kings and Kingdoms`,`The Mughal Empire`,`Environment`],
+      8:[`From Trade to Territory`,`Ruling the Countryside`,`When People Revolt`],
+      9:[`The French Revolution`,`Socialism in Europe`,`Nazism and the Rise of Hitler`,`Forest Society and Colonialism`],
+      10:[`The Rise of Nationalism in Europe`,`Nationalism in India`,`Making of a Global World`,`Power Sharing`,`Federalism`]
+    },
+    Economics: {
+      11:[`Introduction to Microeconomics`,`Central Problems`,`Consumer's Equilibrium`,`Demand`,`Supply`,`Market Equilibrium`],
+      12:[`National Income`,`Money and Banking`,`Determination of Income`,`Government Budget`,`Balance of Payments`]
+    },
+    Accountancy: {
+      11:[`Introduction to Accounting`,`Theory Base`,`Recording of Transactions`,`Bank Reconciliation`,`Trial Balance`,`Depreciation`],
+      12:[`Partnership Accounts`,`Reconstitution of a Partnership`,`Dissolution`,`Share Capital`,`Debentures`,`Cash Flow Statement`]
+    }
+  };
+
+  function getSubjectsForClass() {
+    return Object.keys(SUBJECTS).filter(s => {
+      if (cls <= 10) return !['Economics','Accountancy'].includes(s) && SUBJECTS[s][cls];
+      if (stream === 'Science')  return ['Mathematics','Physics','Chemistry','Biology','English'].includes(s);
+      if (stream === 'Commerce') return ['Mathematics','Economics','Accountancy','English'].includes(s);
+      return ['Mathematics','English','Social Science','Economics'].includes(s);
+    });
+  }
+
+  // Populate subjects dropdown
+  const subSel = document.getElementById('subject-sel');
+  getSubjectsForClass().forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s; opt.textContent = s;
+    subSel.appendChild(opt);
+  });
+
+  // Check URL param for subject pre-selection
+  const urlSubject = new URLSearchParams(window.location.search).get('subject');
+  if (urlSubject && subSel.querySelector(`option[value="${urlSubject}"]`)) {
+    subSel.value = urlSubject;
+    loadChapters();
+  }
+
+  function loadChapters() {
+    const subj = subSel.value;
+    if (!subj) return;
+    const chapters   = SUBJECTS[subj]?.[cls] || SUBJECTS[subj]?.[cls <= 10 ? 9 : 11] || [];
+    const completed  = Storage.getProfile()?.completedChapters || [];
+    const cont = document.getElementById('chapter-list');
+    if (!chapters.length) {
+      cont.innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:8px">No chapters found for this class.</div>';
+      return;
+    }
+    cont.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">Chapters</div>'
+      + chapters.map((ch, i) => {
+          const done = completed.includes(ch);
+          return `<div class="chapter-item${done ? ' done' : ''}" data-chapter="${ch}" data-subject="${subj}" onclick="startChapter(this)">
+            <div class="chapter-item-icon">${done ? '✅' : (i+1)}</div>
+            <div><div class="chapter-item-text">${ch}</div></div>
+          </div>`;
+        }).join('');
+  }
+
+  function addStudyMessage(html, isUser) {
+    const cont = document.getElementById('study-messages');
+    const initials = (profile.name || 'S').split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+    const div = document.createElement('div');
+    div.className = isUser ? 'chat-msg user' : 'chat-msg';
+    div.innerHTML = isUser
+      ? `<div class="chat-avatar user-av">${initials}</div><div class="chat-bubble">${html.replace(/</g,'&lt;')}</div>`
+      : `<div class="chat-avatar ai">AI</div><div class="chat-bubble ai">${html}</div>`;
+    cont.appendChild(div);
+    cont.scrollTop = cont.scrollHeight;
+  }
+
+  function addStudyTyping() {
+    const cont = document.getElementById('study-messages');
+    const id   = 'st_' + Date.now();
+    const div  = document.createElement('div');
+    div.className = 'chat-msg'; div.id = id;
+    div.innerHTML = `<div class="chat-avatar ai">AI</div><div class="chat-bubble ai"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+    cont.appendChild(div);
+    cont.scrollTop = cont.scrollHeight;
+    return id;
+  }
+  function removeStudyTyping(id) { const el = document.getElementById(id); if (el) el.remove(); }
+
+  // FIXED: receives element directly instead of relying on implicit `event`
+  async function startChapter(el) {
+    const subject = el.dataset.subject;
+    const chapter = el.dataset.chapter;
+    document.querySelectorAll('.chapter-item').forEach(e => e.classList.remove('active'));
+    el.classList.add('active');
+    currentChapter = { subject, chapter };
+    studyMessages  = [];
+    document.getElementById('study-messages').innerHTML = '';
+    document.getElementById('study-title').textContent  = chapter;
+    document.getElementById('study-sub').textContent    = `${subject} · Class ${cls}`;
+    document.getElementById('study-input-area').style.display = 'block';
+
+    const typingId = addStudyTyping();
+    try {
+      const sysPrompt = buildSystemPrompt(profile, 'study');
+      const initMsg   = `I want to study "${chapter}" from ${subject} (Class ${cls}). Please begin teaching from the first topic.`;
+      studyMessages.push({ role: 'user', content: initMsg });
+      const response  = await callGrokAPI(studyMessages, sysPrompt);
+      removeStudyTyping(typingId);
+      addStudyMessage(renderText(response));
+      studyMessages.push({ role: 'assistant', content: response });
+      Storage.recordStudySession(subject);
+    } catch(e) {
+      removeStudyTyping(typingId);
+      addStudyMessage(`<span style="color:var(--red)">⚠️ Connection error. Please check your internet and try again.</span>`);
+      console.error('[EduMind study error]', e);
+    }
+  }
+
+  async function sendStudyMessage() {
+    const input = document.getElementById('study-input');
+    const text  = input.value.trim();
+    if (!text || isLoading || !currentChapter) return;
+
+    isLoading = true;
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('study-send-btn').disabled = true;
+
+    addStudyMessage(text, true);
+    studyMessages.push({ role: 'user', content: text });
+    const typingId = addStudyTyping();
+
+    try {
+      const sysPrompt = buildSystemPrompt(profile, 'study');
+      const response  = await callGrokAPI(studyMessages, sysPrompt);
+      removeStudyTyping(typingId);
+      addStudyMessage(renderText(response));
+      studyMessages.push({ role: 'assistant', content: response });
+      Storage.recordStudySession(currentChapter.subject);
+
+      // Check for chapter completion signal
+      const lower = response.toLowerCase();
+      if (lower.includes('chapter complete') || lower.includes('finished the chapter') || lower.includes('covered all topics')) {
+        const prof = Storage.getProfile();
+        if (prof && !prof.completedChapters.includes(currentChapter.chapter)) {
+          prof.completedChapters.push(currentChapter.chapter);
+          Storage.setProfile(prof);
+          loadChapters(); // refresh sidebar ticks
+          showToast('🎉 Chapter completed! Great work!', 'success');
+        }
+      }
+    } catch(e) {
+      removeStudyTyping(typingId);
+      addStudyMessage(`<span style="color:var(--red)">⚠️ Error: ${e.message.replace(/</g,'&lt;')}</span>`);
+      console.error('[EduMind study error]', e);
+    }
+
+    isLoading = false;
+    document.getElementById('study-send-btn').disabled = false;
+    input.focus();
+  }
+
+  const studyInput = document.getElementById('study-input');
+  studyInput.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 120) + 'px'; });
+  studyInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendStudyMessage(); } });
+}
+</script>
+</body>
+</html>

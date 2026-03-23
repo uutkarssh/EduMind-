@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In — EduMind</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon"><svg viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <span class="auth-logo-text">EduMind</span>
+    </div>
+
+    <div class="auth-title">Welcome back 👋</div>
+    <div class="auth-sub">Log in to continue your learning journey.</div>
+
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input type="text" class="form-input" id="inp-username" placeholder="Your username" autocomplete="username" />
+      <div class="form-error" id="err-username">Please enter your username</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" class="form-input" id="inp-password" placeholder="Your password" autocomplete="current-password" />
+      <div class="form-error" id="err-password">Please enter your password</div>
+    </div>
+
+    <div id="err-general" style="display:none;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:10px 14px;font-size:13px;color:#991B1B;margin-bottom:16px">
+      Incorrect username or password. Please try again.
+    </div>
+
+    <button class="btn-primary btn-full" id="login-btn" onclick="handleLogin()">
+      Log In
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+
+    <div style="margin-top:16px;padding:14px;background:var(--green-pale);border-radius:10px;border:1px solid #C8E6C9">
+      <div style="font-size:12px;font-weight:600;color:var(--green-dark);margin-bottom:4px">🎓 Demo Account</div>
+      <div style="font-size:12px;color:var(--green-dark)">Username: <strong>demo</strong> · Password: <strong>demo123</strong></div>
+      <button onclick="loginDemo()" style="margin-top:8px;background:var(--green);color:white;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit">Use Demo Account</button>
+    </div>
+
+    <div class="auth-footer">
+      New to EduMind? <a href="signup.html">Create free account</a>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  EduMind.redirectIfLoggedIn('dashboard.html');
+
+  // Ensure demo account exists
+  (function() {
+    try {
+      const users = JSON.parse(localStorage.getItem('edumind_users') || '{}');
+      if (!users['demo']) {
+        users['demo'] = { password: 'demo123', name: 'Arjun Sharma', studentClass: '12', stream: 'Science', createdAt: new Date().toISOString() };
+        localStorage.setItem('edumind_users', JSON.stringify(users));
+      }
+    } catch(e) { console.warn('Could not init demo account', e); }
+  })();
+
+  function handleLogin() {
+    const username = document.getElementById('inp-username').value.trim().toLowerCase();
+    const password = document.getElementById('inp-password').value;
+
+    // Reset errors
+    document.querySelectorAll('.form-error').forEach(e => e.classList.remove('show'));
+    document.getElementById('err-general').style.display = 'none';
+
+    let valid = true;
+    if (!username) { document.getElementById('err-username').classList.add('show'); valid = false; }
+    if (!password) { document.getElementById('err-password').classList.add('show'); valid = false; }
+    if (!valid) return;
+
+    let users = {};
+    try { users = JSON.parse(localStorage.getItem('edumind_users') || '{}'); } catch {}
+
+    const user = users[username];
+    if (!user || user.password !== password) {
+      document.getElementById('err-general').style.display = 'block';
+      return;
+    }
+
+    // Set session
+    EduMind.Storage.setUser({ username, loggedIn: true });
+
+    // Create or update profile
+    const existingProfile = EduMind.Storage.getProfile();
+    if (!existingProfile || existingProfile.username !== username) {
+      EduMind.Storage.setProfile({
+        name: user.name, studentClass: user.studentClass, stream: user.stream || null,
+        username, weakTopics: [], completedChapters: [], lastActive: new Date().toISOString()
+      });
+    } else {
+      EduMind.Storage.updateProfile({ lastActive: new Date().toISOString() });
+    }
+
+    window.location.href = 'dashboard.html';
+  }
+
+  function loginDemo() {
+    document.getElementById('inp-username').value = 'demo';
+    document.getElementById('inp-password').value = 'demo123';
+    handleLogin();
+  }
+
+  // Enter key on both fields
+  ['inp-username', 'inp-password'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+  });
+</script>
+</body>
+</html>

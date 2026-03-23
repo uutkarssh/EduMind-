@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subjects — EduMind</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="dash-nav">
+  <div class="dash-nav-left">
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon"><svg viewBox="0 0 24 24" fill="white" width="18" height="18"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      EduMind
+    </a>
+    <ul class="dash-nav-links">
+      <li><a href="dashboard.html">🏠 Home</a></li>
+      <li><a href="chat.html">💬 Ask Doubt</a></li>
+      <li><a href="study.html">📚 Study</a></li>
+      <li><a href="subjects.html" class="active">🧪 Subjects</a></li>
+      <li><a href="progress.html">📊 Progress</a></li>
+    </ul>
+  </div>
+  <a href="profile.html" class="nav-user">
+    <div class="nav-avatar" id="nav-avatar">A</div>
+    <div>
+      <div class="nav-user-name" id="nav-name">Student</div>
+      <div class="nav-user-class" id="nav-class">Class 10</div>
+    </div>
+  </a>
+</nav>
+
+<div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <a href="dashboard.html">🏠 Home</a>
+  <a href="chat.html">💬 Ask Doubt</a>
+  <a href="study.html">📚 Study</a>
+  <a href="subjects.html" class="active">🧪 Subjects</a>
+  <a href="progress.html">📊 Progress</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="settings.html">⚙️ Settings</a>
+</div>
+
+<div class="dash-layout">
+  <div class="dash-sidebar">
+    <div class="sidebar-section">
+      <span class="sidebar-section-label">Main</span>
+      <a href="dashboard.html" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+      <a href="chat.html" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Ask a Doubt</a>
+      <a href="study.html" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Study Mode</a>
+      <a href="subjects.html" class="sidebar-link active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Subjects</a>
+    </div>
+  </div>
+
+  <div class="dash-main">
+    <div class="dash-header">
+      <h1 class="dash-title" id="subjects-title">Your Subjects</h1>
+      <p class="dash-subtitle" id="subjects-sub">Click any subject to start studying or asking doubts</p>
+    </div>
+    <div class="subjects-grid" id="subjects-grid"></div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+if (!EduMind.requireAuth()) {/* redirected */} else {
+  EduMind.populateDashNav();
+  EduMind.initMobileNav();
+
+  const profile = EduMind.Storage.getProfile();
+  const cls     = parseInt(profile.studentClass);
+
+  document.getElementById('subjects-title').textContent = `Class ${cls} Subjects`;
+  document.getElementById('subjects-sub').textContent   = `${profile.stream ? profile.stream + ' Stream · ' : ''}Click any subject to study or ask doubts`;
+
+  const SUBJECT_DATA = [
+    { name: 'Mathematics',    emoji: '📐', desc: 'Algebra, geometry, calculus, and more. Step-by-step solutions for every problem.', bg: 'linear-gradient(135deg,#1e1b4b,#3730a3,#4f46e5)', classes: [6,7,8,9,10,11,12], streams: ['Science','Commerce','Arts',null] },
+    { name: 'Physics',        emoji: '⚡', desc: 'Mechanics, electricity, optics, and waves. Perfect for JEE/NEET preparation.',   bg: 'linear-gradient(135deg,#0c1445,#1e3a8a,#2563eb)', classes: [9,10,11,12],     streams: ['Science',null] },
+    { name: 'Chemistry',      emoji: '🧪', desc: 'Organic, inorganic, and physical chemistry with NCERT-level explanations.',       bg: 'linear-gradient(135deg,#064e3b,#065f46,#10b981)', classes: [9,10,11,12],     streams: ['Science',null] },
+    { name: 'Biology',        emoji: '🧬', desc: 'Cell biology, genetics, ecology, and human physiology for NEET aspirants.',       bg: 'linear-gradient(135deg,#14532d,#166534,#16a34a)', classes: [9,10,11,12],     streams: ['Science',null] },
+    { name: 'English',        emoji: '📖', desc: 'Grammar, writing skills, comprehension, and literature analysis.',                bg: 'linear-gradient(135deg,#450a0a,#991b1b,#dc2626)', classes: [6,7,8,9,10,11,12],streams: ['Science','Commerce','Arts',null] },
+    { name: 'Social Science', emoji: '🌍', desc: 'History, Geography, Civics, and Economics — board-exam focused.',                  bg: 'linear-gradient(135deg,#0a1a2e,#1a3a6e,#2e5a8e)', classes: [6,7,8,9,10],     streams: [null] },
+    { name: 'Economics',      emoji: '📊', desc: 'Micro and macroeconomics with India-specific examples. Perfect for Commerce.',    bg: 'linear-gradient(135deg,#431407,#9a3412,#ea580c)', classes: [11,12],            streams: ['Commerce','Arts',null] },
+    { name: 'Accountancy',    emoji: '💼', desc: 'Journal entries, balance sheets, and financial statements made simple.',          bg: 'linear-gradient(135deg,#1e1b4b,#6d28d9,#8b5cf6)', classes: [11,12],            streams: ['Commerce',null] },
+  ];
+
+  const grid = document.getElementById('subjects-grid');
+  SUBJECT_DATA.forEach(sub => {
+    const visible = sub.classes.includes(cls) &&
+      (cls <= 10 || sub.streams.includes(null) || sub.streams.includes(profile.stream));
+    if (!visible) return;
+    const card = document.createElement('div');
+    card.className = 'subject-card';
+    card.innerHTML = `
+      <div class="subject-card-img" style="background:${sub.bg}">
+        <div style="font-size:32px">${sub.emoji}</div>
+        <div class="subject-card-img-title">${sub.name}</div>
+      </div>
+      <div class="subject-card-body">
+        <div class="subject-card-name">${sub.name}</div>
+        <div class="subject-card-desc">${sub.desc}</div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn-primary btn-sm" onclick="event.stopPropagation();studySubject('${sub.name}')">📚 Study</button>
+          <button class="btn-secondary btn-sm" onclick="event.stopPropagation();askDoubt('${sub.name}')">💬 Ask</button>
+        </div>
+      </div>`;
+    card.addEventListener('click', () => studySubject(sub.name));
+    grid.appendChild(card);
+  });
+
+  // FIXED: pass subject name via URL query parameter
+  function studySubject(name) {
+    window.location.href = `study.html?subject=${encodeURIComponent(name)}`;
+  }
+  function askDoubt(name) {
+    window.location.href = `chat.html`;
+    // Store pre-fill intent for chat page
+    sessionStorage.setItem('edumind_chat_prefill', `I have a question about ${name}.`);
+  }
+}
+</script>
+</body>
+</html>
